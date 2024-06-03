@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/rivkyschon/Varonis-assignment.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the Docker image...'
+                sh 'docker build -t django_app .'
+            }
+        }
+        stage('Push') {
+            steps {
+                echo 'Pushing the Docker image...'
+                sh 'docker login -u rivkyschon -p Ro506632774'
+                sh 'docker push django_app'
+            }
+        }
+    }
+}

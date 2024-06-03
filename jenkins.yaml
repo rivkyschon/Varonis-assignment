@@ -1,0 +1,13 @@
+jenkins:
+  systemMessage: 'Jenkins configured with JCasC'
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: 1234 # Replace with your password
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - 'Overall/Administer:admin'
+        - 'Overall/Read:authenticated'
