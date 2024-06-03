@@ -113,3 +113,5 @@ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
     -v /var/jenkins_config/jenkins.yaml:/var/jenkins_home/jenkins.yaml:ro \
     -e CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins.yaml \
     jenkins/jenkins:lts
+
+

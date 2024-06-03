@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "4.40.0" # Or the latest version
     }
   }
@@ -29,9 +29,20 @@ resource "google_compute_instance" "jenkins_vm" {
   }
 
   metadata = {
-    # Add startup script for Jenkins installation (see below)
-    startup-script = file("startup.sh") 
+    startup-script = file("startup.sh")
   }
+}
+
+resource "google_compute_firewall" "allow_jenkins" {
+  name    = "allow-jenkins"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "80", "443"] # Adjust as needed
+  }
+
+  source_ranges = ["0.0.0.0/0"]
 }
 
 output "instance_ip" {
