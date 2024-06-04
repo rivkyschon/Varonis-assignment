@@ -1,30 +1,48 @@
-#-------------------------------- Build stage -----------------------------------------
-# Use a slim Python 3.9 image as the base image for the build stage
-FROM python:3.9-slim AS build
+# -------------------------------- Build stage -----------------------------------------
 
-# Copy only the requirements file and install dependencies first to benefit from caching
-COPY requirements.txt .
+    FROM python:3.9.16-slim AS build
 
-# Install Python dependencies from the requirements file
-RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org -r requirements.txt
-
-
-# --------------------------- Runtime stage ---------------------------------------------
-FROM python:3.9-slim
-
-# Copy installed Python packages from the build stage to the runtime stage
-COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-
-# Set the working directory inside the container to /django_app
-WORKDIR /django_app
-
-# Copy the application code from the local directory to /django_app in the container
-COPY . /django_app/
-
-# Run the Django application when the container starts
-CMD ["python", "django_web_app/manage.py", "runserver", "0.0.0.0:8000"]
-
-
+    # Set working directory
+    WORKDIR /app
+    
+    # Copy requirements and install dependencies
+    COPY requirements.txt .
+    RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements.txt
+    
+    # --------------------------- Runtime stage ---------------------------------------------
+    
+    FROM python:3.9.16-slim
+    
+    # Create a non-root user
+    RUN adduser --disabled-password --gecos "" django_user
+    
+    # Copy installed packages from the build stage
+    COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+    
+    # Set working directory
+    WORKDIR /django_app
+    
+    # Copy application code
+    COPY . /django_app/
+    
+    # Change ownership of the application directory
+    RUN chown -R django_user:django_user /django_app
+    
+    # Switch to non-root user
+    USER django_user
+    
+    # Set environment variables
+    ENV DJANGO_SECRET_KEY=your_secret_key
+    
+    # Expose the port the app runs on
+    EXPOSE 8000
+    
+    # Add a health check
+    # HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:8000/health || exit 1
+    
+    # Command to run the application
+    CMD ["python", "django_web_app/manage.py", "runserver", "0.0.0.0:8000"]
+    
 # # Use an official Python runtime as a parent image
 # FROM python:3.9-slim
 
