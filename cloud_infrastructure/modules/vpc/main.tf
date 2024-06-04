@@ -14,7 +14,7 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 resource "google_compute_firewall" "default" {
-  name    = "default-allow-internal"
+  name    = "infra-allow-internal"
   network = google_compute_network.vpc_network.name
   project = var.project_id
 
@@ -36,7 +36,7 @@ resource "google_compute_firewall" "default" {
 }
 
 resource "google_compute_firewall" "ssh" {
-  name    = "default-allow-ssh"
+  name    = "infra-allow-ssh"
   network = google_compute_network.vpc_network.name
   project = var.project_id
 
