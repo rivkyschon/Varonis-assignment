@@ -14,9 +14,9 @@ provider "google" {
 }
 
 module "network" {
-  source                  = "./modules/network"
-  vpc_name                = var.vpc_name
-  region                  = var.region
-  cloud_run_subnet_cidr   = var.cloud_run_subnet_cidr
-  lb_subnet_cidr          = var.lb_subnet_cidr
+  source                 = "./modules/network"
+  vpc_name               = var.vpc_name        # From your terraform.tfvars
+  region                 = var.region           # From your terraform.tfvars
+  cloud_run_subnet_cidr  = var.cloud_run_subnet_cidr 
+  lb_subnet_cidr         = var.lb_subnet_cidr 
 }

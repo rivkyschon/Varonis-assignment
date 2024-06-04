@@ -1,26 +1,19 @@
 variable "vpc_name" {
   type        = string
-  description = "Name of the VPC"
+  description = "Name of the VPC to create."
 }
 
 variable "region" {
   type        = string
-  description = "Region for the VPC and subnets"
+  description = "The region to deploy resources into."
 }
 
 variable "cloud_run_subnet_cidr" {
   type        = string
-  description = "CIDR block for the Cloud Run subnet"
+  description = "CIDR block for the Cloud Run subnet."
 }
 
 variable "lb_subnet_cidr" {
   type        = string
-  description = "CIDR block for the load balancer subnet"
-}
-
-# Optional: For VPC Connector
-variable "connector_cidr_range" {
-  type        = string
-  description = "CIDR block for the VPC connector"
-  default     = null  
+  description = "CIDR block for the load balancer subnet."
 }
