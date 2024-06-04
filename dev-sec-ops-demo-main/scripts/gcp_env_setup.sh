@@ -50,9 +50,9 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 #Create a Default VPC and its embedded Subnet. This is under the assumption that the new GCP project did NOT automatically create a default VPC and Subnet.
 #If the creation of a default VPC is not needed, comment out the following 3 commands.
 
-# SUBNET_RANGE=10.128.0.0/20
-# gcloud compute networks create default --subnet-mode=custom --bgp-routing-mode=regional --mtu=1460
-# gcloud compute networks subnets create default --project=$PROJECT_ID --range=$SUBNET_RANGE --network=default --region=$LOCATION
+SUBNET_RANGE=10.128.0.0/20
+gcloud compute networks create default --subnet-mode=custom --bgp-routing-mode=regional --mtu=1460
+gcloud compute networks subnets create default --project=$PROJECT_ID --range=$SUBNET_RANGE --network=default --region=$LOCATION
 
 #Binary Authorization Attestor variables
 ATTESTOR_ID=cb-attestor
