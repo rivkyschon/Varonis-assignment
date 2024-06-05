@@ -9,7 +9,6 @@ resource "google_kms_crypto_key" "key" {
   name     = var.key_name
   key_ring = google_kms_key_ring.key_ring
   purpose  = "ENCRYPT_DECRYPT"
-  project  = var.project_id
 }
 
 # Optionally, you can add IAM policy bindings for the key
