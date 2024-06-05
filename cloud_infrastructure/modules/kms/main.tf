@@ -7,7 +7,7 @@ resource "google_kms_key_ring" "key_ring" {
 
 resource "google_kms_crypto_key" "key" {
   name     = var.key_name
-  key_ring = google_kms_key_ring.key_ring.self_link
+  key_ring = google_kms_key_ring.key_ring.name
   purpose  = "ENCRYPT_DECRYPT"
 }
 
