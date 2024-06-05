@@ -12,7 +12,7 @@ resource "google_artifact_registry_repository" "docker_repo" {
 
 
 resource "google_kms_crypto_key_iam_member" "crypto_key" {
-  crypto_key_id = "kms-key"
+  crypto_key_id = var.kms_key_name
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member        = "users:rivky.schon@grunitech.com"
 }
