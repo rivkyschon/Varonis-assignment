@@ -1,0 +1,29 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: ci-cd-test
+  description: "Pipeline for deploying to Cloud Run"
+render:
+  cloudRun:
+    service:
+      name: notes-app-service
+      location: us-central1
+targets:
+  - name: prod
+    requireApproval: false
+    description: "Production environment"
+    run:
+      service: notes-app-service
+      region: us-central1
+deployments:
+  - name: deploy-to-cloud-run
+    description: "Deploy to Cloud Run"
+    action:
+      cloudRun:
+        service:
+          name: notes-app-service
+          location: us-central1
+        images:
+          - us-central1-docker.pkg.dev/$PROJECT_ID/$_CONTAINER_REPO_NAME/cd@sha256:$(cat /workspace/digest.txt)
+    targets:
+      - prod

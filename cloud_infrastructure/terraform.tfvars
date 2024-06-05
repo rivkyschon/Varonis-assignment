@@ -23,3 +23,8 @@ access_context_manager_policy_id            = "true"
 access_level_members                        = ["user:rivky.schon@grunitech.com"]
 domain                                      = ["my-domain.com"]
 create_access_context_manager_access_policy = false
+
+
+#load balancer:
+name = "my-lb"
+domain = "my-domain-name"

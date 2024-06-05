@@ -8,6 +8,12 @@ terraform {
   }
 }
 
+resource "null_resource" "setup_iam_roles" {
+  provisioner "local-exec" {
+    command = "../setup_iam_roles.sh"
+  }
+}
+
 provider "google" {
   project     = var.project_id
   region      = var.region
@@ -45,4 +51,15 @@ module "artifact_registry" {
 
 module "cloud_run" {
   source  = "./modules/cloud_run"
+  location = var.location
+  region = var.region
+}
+
+
+module "cloud_load_balancer" {
+  source = "./modules/cloud_load_balancer"
+  name   = var.name
+  region = var.region
+  domain = var.domain
+  project_id = var.project_id
 }

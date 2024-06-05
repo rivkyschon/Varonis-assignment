@@ -1,11 +1,21 @@
-resource "google_cloud_run_v2_service" "default" {
-  name     = "cloudrun-service"
-  location = "us-central1"
-  ingress = "INGRESS_TRAFFIC_ALL"
+resource "google_cloud_run_service" "default" {
+  name     = "hello"
+  location = var.region
+  project  = var.project
 
   template {
-    containers {
-      image = "us-docker.pkg.dev/cloudrun/container/hello"
+    spec {
+      containers {
+        image = "gcr.io/cloudrun/hello"
+      }
     }
   }
+}
+
+resource "google_cloud_run_service_iam_member" "member" {
+  location = google_cloud_run_service.default.location
+  project  = google_cloud_run_service.default.project
+  service  = google_cloud_run_service.default.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
