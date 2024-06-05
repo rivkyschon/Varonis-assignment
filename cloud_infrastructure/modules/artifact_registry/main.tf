@@ -4,7 +4,7 @@ resource "google_artifact_registry_repository" "docker_repo" {
   description = var.description
   format      = "DOCKER"
 
-  kms_key_name = "key_ring"
+#  kms_key_name = "key_ring"
 
 }
 
