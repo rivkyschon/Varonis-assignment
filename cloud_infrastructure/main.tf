@@ -30,9 +30,9 @@ module "kms" {
   source     = "./modules/kms"
   project_id = var.project_id
   keyring    = "artifact_registry_kms"
-  key_name   = "my-artifact-registry-key"
+  key_name   = "my_artifact_registry_key"
   location   = var.location
-  members    = ["rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
+  members    = [user:"rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
 }
 
 module "artifact_registry" {
