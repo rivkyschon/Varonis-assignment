@@ -14,7 +14,7 @@ resource "google_artifact_registry_repository" "docker_repo" {
 resource "google_kms_crypto_key_iam_member" "crypto_key" {
   crypto_key_id = "kms-key"
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member        = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+  member        = [users:"rinky.schon@grunitech.com]
 }
 
 data "google_project" "project" {}
