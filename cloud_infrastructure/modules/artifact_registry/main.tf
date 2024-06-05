@@ -14,19 +14,15 @@ data "google_iam_policy" "artifact_registry_policy" {
   binding {
     role = "roles/artifactregistry.writer"
 
-    members = [
-      # Add the service accounts or groups that need write access
-      var.writer_members,
-    ]
+    members = var.writer_members
+    
   }
 
   binding {
     role = "roles/artifactregistry.reader"
 
-    members = [
-      # Add the service accounts or groups that only need read access
-      var.reader_members,
-    ]
+    members = var.reader_members
+    
   }
 }
 
