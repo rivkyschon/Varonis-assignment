@@ -11,6 +11,23 @@ resource "google_compute_managed_ssl_certificate" "default" {
   }
 }
 
+# Cloud Armor Security Policy
+resource "google_compute_security_policy" "policy" {
+  name        = "cloud-armor-policy"
+  description = "Strict security policy for Cloud Run service"
+  rule {
+    action   = "deny(403)"
+    priority = "2147483647"
+    match {
+      versioned_expr = "SRC_IPS_ALL"
+    }
+    description = "Default deny rule"
+  }
+
+  # Add more specific Cloud Armor rules - OWASP Top 10 rules
+}
+
+# Global Network Endpoint Group
 resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
   provider              = google-beta
   name                  = "${var.lb_name}-neg"
@@ -21,6 +38,19 @@ resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
   }
 }
 
+
+# Health Check
+resource "google_compute_health_check" "default" {
+  name               = "${var.lb_name}-health-check"
+  timeout_sec        = 10
+  check_interval_sec = 5
+  http_health_check {
+    port = "80" # Health check port on Cloud Run service
+    request_path = "/" 
+  }
+}
+
+# Backend Service
 resource "google_compute_backend_service" "default" {
   name      = "${var.lb_name}-backend"
 
@@ -31,6 +61,10 @@ resource "google_compute_backend_service" "default" {
   backend {
     group = google_compute_region_network_endpoint_group.cloudrun_neg.id
   }
+  health_checks         = [google_compute_health_check.default.id]
+
+  security_policy = google_compute_security_policy.policy.id
+
 }
 
 
