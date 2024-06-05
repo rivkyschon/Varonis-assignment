@@ -1,17 +1,3 @@
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-
 resource "google_cloudbuild_trigger" "my_trigger" {
   name        = "my-cloudbuild-trigger"
   description = "Trigger to run cloudbuild.yaml"
