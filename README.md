@@ -1,2 +1,1 @@
-
 # Varonis-assignment..
