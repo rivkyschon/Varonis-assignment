@@ -27,12 +27,6 @@ module "network" {
 }
 
 module "kms_key" {
-  source = "terraform-google-modules/kms/google//modules/cryptokey"
-  
-}
-
-
-module "kms_key" {
   source  = "terraform-google-modules/kms/google//examples/simple_example"
   version = "2.3.0" // or latest version
   keyring = "artifact_registry_kms" // name for your keyring
