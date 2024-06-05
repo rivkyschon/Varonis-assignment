@@ -13,7 +13,7 @@ resource "google_compute_managed_ssl_certificate" "default" {
 
 resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
   provider              = google-beta
-  name                  = "${var.name}-neg"
+  name                  = "${var.lb_name}-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
   cloud_run {
@@ -22,7 +22,7 @@ resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
 }
 
 resource "google_compute_backend_service" "default" {
-  name      = "${var.name}-backend"
+  name      = "${var.lb_name}-backend"
 
   protocol  = "HTTP"
   port_name = "http"
@@ -35,14 +35,14 @@ resource "google_compute_backend_service" "default" {
 
 
 resource "google_compute_url_map" "default" {
-  name            = "${var.name}-urlmap"
+  name            = "${var.lb_name}-urlmap"
 
   default_service = google_compute_backend_service.default.id
 }
 
 
 resource "google_compute_target_https_proxy" "default" {
-  name   = "${var.name}-https-proxy"
+  name   = "${var.lb_name}-https-proxy"
 
   url_map          = google_compute_url_map.default.id
   ssl_certificates = [
@@ -51,7 +51,7 @@ resource "google_compute_target_https_proxy" "default" {
 }
 
 resource "google_compute_global_forwarding_rule" "default" {
-  name   = "${var.name}-lb"
+  name   = "${var.lb_name}-lb"
 
   target = google_compute_target_https_proxy.default.id
   port_range = "443"
@@ -64,7 +64,7 @@ output "load_balancer_ip" {
 
 
 resource "google_compute_url_map" "https_redirect" {
-  name            = "${var.name}-https-redirect"
+  name            = "${var.lb_name}-https-redirect"
 
   default_url_redirect {
     https_redirect         = true
@@ -74,12 +74,12 @@ resource "google_compute_url_map" "https_redirect" {
 }
 
 resource "google_compute_target_http_proxy" "https_redirect" {
-  name   = "${var.name}-http-proxy"
+  name   = "${var.lb_name}-http-proxy"
   url_map          = google_compute_url_map.https_redirect.id
 }
 
 resource "google_compute_global_forwarding_rule" "https_redirect" {
-  name   = "${var.name}-lb-http"
+  name   = "${var.lb_name}-lb-http"
 
   target = google_compute_target_http_proxy.https_redirect.id
   port_range = "80"

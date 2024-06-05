@@ -74,6 +74,11 @@ variable "reader_members" {
   default     = []
 }
 
+variable "lb_name" {
+  description = "Name for the load balancer resources"
+  type        = string
+}
+
 
 # Add more variables here if you have additional ones in your terraform.tfvars file
 # ... (other variables if applicable)

@@ -51,7 +51,6 @@ module "artifact_registry" {
 
 module "cloud_run" {
   source  = "./modules/cloud_run"
-  name   = var.name
   region = var.region
   project_id = var.project_id
 }
@@ -59,7 +58,7 @@ module "cloud_run" {
 
 module "cloud_load_balancer" {
   source = "./modules/cloud_load_balancer"
-  name   = var.name
+  lb_name   = var.name
   region = var.region
   domain = var.domain
   project_id = var.project_id
