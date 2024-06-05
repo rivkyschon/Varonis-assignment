@@ -5,7 +5,7 @@ steps:
      args:
      - -c
      - |
-       docker build -t us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0 -f ./Dockerfile . &&
+       docker build -t us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0 . &&
        docker image inspect us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0
    - id: Scan The Image
      name: 'gcr.io/cloud-builders/gcloud'
