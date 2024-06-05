@@ -19,7 +19,7 @@ resource "google_compute_security_policy" "policy" {
     action   = "deny(403)"
     priority = "2147483647"
     match {
-      versioned_expr = "SRC_IPS_ALL"
+      versioned_expr = "SRC_IPS_V1"
     }
     description = "Default deny rule"
   }
