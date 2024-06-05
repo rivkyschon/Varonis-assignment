@@ -7,8 +7,11 @@ resource "google_kms_key_ring" "key_ring" {
 
 resource "google_kms_crypto_key" "key" {
   name     = var.key_name
-  key_ring = google_kms_key_ring.key_ring.name
+  key_ring = google_kms_key_ring.key_ring.id
   purpose  = "ENCRYPT_DECRYPT"
+  version_template {
+    algorithm = "EC_SIGN_P384_SHA384"
+  }
 }
 
 # Optionally, you can add IAM policy bindings for the key
