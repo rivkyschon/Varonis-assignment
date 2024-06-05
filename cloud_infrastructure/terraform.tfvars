@@ -13,5 +13,6 @@ repository_id   = "my-docker-repo"
 kms_key_name    = "projects/varonis-assignment-425319/locations/global/keyRings/artifact_registry_kms"
 writer_members  = ["serviceAccount:your-cloud-build-service-account@your-project-id.iam.gserviceaccount.com",]  
 reader_members  = ["serviceAccount:your-cloud-run-service-account@your-project-id.iam.gserviceaccount.com",]
+members  = ["serviceAccount:your-cloud-run-service-account@your-project-id.iam.gserviceaccount.com",]
 
 #
