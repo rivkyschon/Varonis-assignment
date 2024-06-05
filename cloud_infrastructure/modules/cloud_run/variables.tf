@@ -1,4 +1,4 @@
-variable "name" {
+variable "cr_name" {
   description = "Name for the load balancer resources"
   type        = string
 }

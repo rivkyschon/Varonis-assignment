@@ -50,6 +50,7 @@ module "artifact_registry" {
 }
 
 module "cloud_run" {
+  cr_name = "cr"
   source  = "./modules/cloud_run"
   region = var.region
   project_id = var.project_id
