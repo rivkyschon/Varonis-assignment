@@ -26,11 +26,13 @@ module "network" {
   lb_subnet_cidr         = var.lb_subnet_cidr 
 }
 
-module "kms_key" {
-  source  = "terraform-google-modules/kms/google//examples/simple_example"
-  version = "2.3.0"
-  keyring = "artifact_registry_kms"
-  project_id = "varonis-assignment-425319"
+module "kms" {
+  source     = "./modules/kms"
+  project_id = var.project_id
+  keyring    = "artifact_registry_kms"
+  key_name   = "my-artifact-registry-key"
+  location   = var.location
+  members    = ["rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
 }
 
 module "artifact_registry" {
@@ -38,7 +40,7 @@ module "artifact_registry" {
   location          = var.region 
   repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
-  kms_key_name      =  module.kms_key.key_name
+  kms_key_name      = module.kms.key_name
   writer_members    = var.writer_members
   reader_members    = var.reader_members
 }
