@@ -32,7 +32,7 @@ module "kms" {
   keyring    = "artifact_registry_kms"
   key_name   = "my_artifact_registry_key"
   location   = var.location
-  members    = [user:"rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
+  members    = ["rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
 }
 
 module "artifact_registry" {
