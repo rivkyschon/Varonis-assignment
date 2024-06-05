@@ -8,12 +8,6 @@ terraform {
   }
 }
 
-resource "null_resource" "setup_iam_roles" {
-  provisioner "local-exec" {
-    #command = "../setup_iam_roles.sh"
-  }
-}
-
 provider "google" {
   project     = var.project_id
   region      = var.region
