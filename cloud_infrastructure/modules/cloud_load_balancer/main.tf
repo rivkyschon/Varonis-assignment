@@ -41,18 +41,6 @@ resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
   }
 }
 
-
-# Health Check
-resource "google_compute_health_check" "default" {
-  name               = "${var.lb_name}-health-check"
-  timeout_sec        = 3
-  check_interval_sec = 5
-  http_health_check {
-    port = "80" # Health check port on Cloud Run service
-    request_path = "/" 
-  }
-}
-
 # Backend Service
 resource "google_compute_backend_service" "default" {
   name      = "${var.lb_name}-backend"
@@ -64,10 +52,7 @@ resource "google_compute_backend_service" "default" {
   backend {
     group = google_compute_region_network_endpoint_group.cloudrun_neg.id
   }
-  health_checks         = [google_compute_health_check.default.id]
-
   security_policy = google_compute_security_policy.policy.id
-
 }
 
 
