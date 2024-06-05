@@ -19,7 +19,6 @@ gcloud services enable binaryauthorization.googleapis.com
 
 
 
-
 #GCP Project Variables
 LOCATION=us-central1
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
