@@ -60,3 +60,9 @@ module "cloud_load_balancer" {
   project_id = var.project_id
   cloud_run_service_name = module.cloud_run.cloud_run_service_name
 }
+
+module "cloud_build" {
+  source = "./modules/cloud_build"
+  region = var.region
+  project_id = var.project_id
+}

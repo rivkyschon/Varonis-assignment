@@ -11,6 +11,26 @@ resource "google_compute_managed_ssl_certificate" "default" {
   }
 }
 
+# Cloud Armor Security Policy
+resource "google_compute_security_policy" "policy" {
+  name        = "cloud-armor-policy"
+  description = "Strict security policy for Cloud Run service"
+  rule {
+    action   = "deny(403)"
+    priority = "2147483647"
+    match {
+      versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]  # Match all source IP addresses
+      }
+    }
+    description = "Default deny rule"
+  }
+
+  # Add more specific Cloud Armor rules - OWASP Top 10 rules
+}
+
+# Global Network Endpoint Group
 resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
   provider              = google-beta
   name                  = "${var.lb_name}-neg"
@@ -21,6 +41,7 @@ resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
   }
 }
 
+# Backend Service
 resource "google_compute_backend_service" "default" {
   name      = "${var.lb_name}-backend"
 
@@ -31,6 +52,7 @@ resource "google_compute_backend_service" "default" {
   backend {
     group = google_compute_region_network_endpoint_group.cloudrun_neg.id
   }
+  security_policy = google_compute_security_policy.policy.id
 }
 
 
