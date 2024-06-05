@@ -42,3 +42,15 @@ module "artifact_registry" {
   description       = "Docker repository for my secure web app"
   kms_key_name      = module.kms.key_name
 }
+
+module "cloud-run_example_secure_cloud_run_standalone" {
+  source  = "GoogleCloudPlatform/cloud-run/google//examples/secure_cloud_run_standalone"
+  version = "0.11.0"
+  # insert the 5 required variables here
+  access_level_members = ["rivky.schon@grunitech.com]
+  billing_account = "01C0B1-CE5636-3616F0"
+  create_access_context_manager_access_policy =
+  domain = "grunitech.com"
+  org_id = 
+
+}
