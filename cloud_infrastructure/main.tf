@@ -44,7 +44,7 @@ module "artifact_registry" {
 }
 
 module "cloud_run" {
-  image = "gcr.io/cloudrun/hello"
+  image = "us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app"
   cr_name = "cr"
   source  = "./modules/cloud_run"
   region = var.region
