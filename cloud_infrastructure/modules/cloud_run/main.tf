@@ -15,7 +15,7 @@ module "secure_harness" {
 
   billing_account                             = var.billing_account
   security_project_name                       = " Varonis-assignment"
-  serverless_project_names                    = [" Varonis-assignment"]
+  serverless_project_names                    = ["Varonis-assignment"]
   org_id                                      = var.org_id
   parent_folder_id                            = var.parent_folder_id
   serverless_folder_suffix                    = random_id.random_folder_suffix.hex
