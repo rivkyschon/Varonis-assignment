@@ -1,7 +1,7 @@
 resource "google_cloud_run_service" "default" {
   name     = "hello"
   location = var.region
-  project  = var.project
+  project  = var.project_id
 
   template {
     spec {

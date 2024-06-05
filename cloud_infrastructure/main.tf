@@ -59,7 +59,7 @@ module "cloud_run" {
 
 module "cloud_load_balancer" {
   source = "./modules/cloud_load_balancer"
-  lb_name   = var.name
+  lb_name   = var.lb_name
   region = var.region
   domain = var.domain
   project_id = var.project_id
