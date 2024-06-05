@@ -46,7 +46,7 @@ module "artifact_registry" {
 module "cloud_run" {
   source  = "./modules/cloud_run"
   # insert the 5 required variables here
-  access_level_members = ["rivky.schon@grunitech.com]
+  access_level_members = ["rivky.schon@grunitech.com"]
   billing_account = "01C0B1-CE5636-3616F0"
   domain = "grunitech.com"
 }
