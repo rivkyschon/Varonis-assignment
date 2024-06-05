@@ -27,11 +27,11 @@ module "network" {
 }
 
 #module "kms" {
-#  source     = "./modules/kms"
+ # source     = "./modules/kms"
  # project_id = var.project_id
-  #keyring    = "artifact_registry_kms"
+ # keyring    = "artifact_registry_kms"
  # key_name   = "my_artifact_registry_key"
-  #location   = var.location
+ # location   = var.location
  # members    = ["rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
 #}
 
@@ -40,9 +40,14 @@ module "artifact_registry" {
   location          = var.region 
   repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
-#  kms_key_name      = module.kms.key_name
+  kms_key_name      = module.kms.key_name
 }
 
-module "cloud_run" {
+module "cloud-run_example_secure_cloud_run_standalone" {
   source  = "./modules/cloud_run"
+  # insert the 5 required variables here
+  access_level_members = ["rivky.schon@grunitech.com]
+  billing_account = "01C0B1-CE5636-3616F0"
+  create_access_context_manager_access_policy =
+  domain = "grunitech.com"
 }
