@@ -40,7 +40,7 @@ module "artifact_registry" {
   location          = var.region 
   repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
-  kms_key_name      = module.kms.key_name
+ # kms_key_name      = module.kms.key_name
 }
 
 module "cloud_run" {
