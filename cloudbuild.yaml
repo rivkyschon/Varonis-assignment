@@ -7,6 +7,8 @@ steps:
      - |
        docker build -t us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0 . &&
        docker image inspect us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0
+      options:
+        requestedVerifyOption: VERIFIED
    - id: Scan The Image
      name: 'gcr.io/cloud-builders/gcloud'
      entrypoint: /bin/bash
