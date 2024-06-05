@@ -38,6 +38,7 @@ module "kms" {
 module "artifact_registry" {
   source            = "./modules/artifact_registry"
   location          = var.region 
+  repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
   kms_key_name      = module.kms.key_name
 }
