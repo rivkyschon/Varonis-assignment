@@ -43,7 +43,7 @@ module "artifact_registry" {
   kms_key_name      = module.kms.key_name
 }
 
-module "cloud-run_example_secure_cloud_run_standalone" {
+module "cloud_run" {
   source  = "./modules/cloud_run"
   # insert the 5 required variables here
   access_level_members = ["rivky.schon@grunitech.com]
