@@ -26,19 +26,29 @@ module "network" {
   lb_subnet_cidr         = var.lb_subnet_cidr 
 }
 
-#module "kms_key" {
- # source  = "terraform-google-modules/kms/google//examples/simple_example"
-  #version = "2.3.0"
-  #keyring = "artifact_registry_kms"
-  #project_id = "varonis-assignment-425319"
-#}
+module "kms_key" {
+  source = "terraform-google-modules/kms/google//modules/cryptokey"
+  version = "2.3.0" // or latest version
+  keyring = "artifact_registry_kms" // name for your keyring
+  key_name = "my-artifact-registry-key" // name for the key
+  key_rotation_period_seconds = 2592000 // optional, default 30 days
+  purpose = "ASYMMETRIC_SIGN" 
+  algorithm = "EC_SIGN_P256_SHA256" // recommended
+  iam_members = [
+    "serviceAccount:service-${data.google_project.project.number}@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+  ]
+}
+
 
 module "artifact_registry" {
+    depends_on = [
+    module.kms_key
+  ]
   source            = "./modules/artifact_registry"
   location          = var.region 
   repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
-  kms_key_name      = var.kms_key_name
+  kms_key_name      = module.kms_key.key_name
   writer_members    = var.writer_members
   reader_members    = var.reader_members
 }
