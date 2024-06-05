@@ -17,4 +17,3 @@ resource "google_kms_crypto_key_iam_member" "crypto_key" {
   member        = [users:"rinky.schon@grunitech.com]
 }
 
-data "google_project" "project" {}
