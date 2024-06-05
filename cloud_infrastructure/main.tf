@@ -63,4 +63,5 @@ module "cloud_load_balancer" {
   region = var.region
   domain = var.domain
   project_id = var.project_id
+  cloud_run_service_name = module.cloud_run.cloud_run_service_name
 }

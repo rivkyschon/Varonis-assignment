@@ -17,3 +17,8 @@ variable "project_id" {
   description = "Project ID where the load balancer resources will be created"
   type        = string
 }
+
+variable "cloud_run_service_name" {
+  description = "The name of the Cloud Run service"
+  type        = string
+}
