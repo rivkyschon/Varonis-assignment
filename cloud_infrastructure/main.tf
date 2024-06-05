@@ -44,6 +44,7 @@ module "artifact_registry" {
 }
 
 module "cloud_run" {
+  image = "gcr.io/cloudrun/hello"
   cr_name = "cr"
   source  = "./modules/cloud_run"
   region = var.region

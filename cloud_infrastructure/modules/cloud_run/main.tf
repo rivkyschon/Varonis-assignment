@@ -6,7 +6,7 @@ resource "google_cloud_run_service" "default" {
   template {
     spec {
       containers {
-        image = "gcr.io/cloudrun/hello"
+        image = var.image
       }
     }
   }
