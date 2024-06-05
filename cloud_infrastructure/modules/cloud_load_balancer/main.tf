@@ -1,11 +1,11 @@
 resource "google_compute_global_address" "default" {
-  name = "${var.name}-address"
+  name = "${var.lb_name}-address"
 }
 
 resource "google_compute_managed_ssl_certificate" "default" {
   provider = google-beta
 
-  name = "${var.name}-cert"
+  name = "${var.lb_name}-cert"
   managed {
     domains = ["${var.domain}"]
   }

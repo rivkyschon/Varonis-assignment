@@ -14,6 +14,11 @@ variable "vpc_name" {
   description = "Name of the VPC"
 }
 
+variable "domain" {
+  description = "Domain for the managed SSL certificate"
+  type        = string
+}
+
 variable "cloud_run_subnet_cidr" {
   type        = string
   description = "CIDR block for the Cloud Run subnet"
