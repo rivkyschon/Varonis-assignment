@@ -13,6 +13,11 @@ provider "google" {
   region      = var.region
 }
 
+provider "google-beta" {
+  project     = var.project_id
+  region      = var.region
+}
+
 module "network" {
   source                 = "./modules/network"
   vpc_name               = var.vpc_name        # From your terraform.tfvars
