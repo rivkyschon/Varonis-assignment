@@ -10,7 +10,7 @@ terraform {
 
 resource "null_resource" "setup_iam_roles" {
   provisioner "local-exec" {
-    command = "../setup_iam_roles.sh"
+    #command = "../setup_iam_roles.sh"
   }
 }
 
