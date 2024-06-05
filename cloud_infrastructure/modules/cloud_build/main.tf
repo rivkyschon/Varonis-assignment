@@ -3,11 +3,11 @@ resource "google_cloudbuild_trigger" "my_trigger" {
   description = "Trigger to run cloudbuild.yaml"
 
   trigger_template {
-    branch_name = "main"   // Or specify a different branch or tag
-    repo_name   = "Varonis-assignment"
+    branch_name = "main" 
+    repo_name   = "rivkyschon/Varonis-assignment"
   }
 
   filename = "cloudbuild.yaml" 
 
-  # service_account = "your-service-account-email" // Optional
+  # service_account = "your-service-account-email"
 }
