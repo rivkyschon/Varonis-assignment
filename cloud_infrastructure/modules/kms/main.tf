@@ -16,5 +16,5 @@ resource "google_project_iam_binding" "kms_key_binding" {
   project = var.project_id
   role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   
-  members = ["rivky.schon@grunitech.com"]
+  members = ["user:rivky.schon@grunitech.com"]
 }
