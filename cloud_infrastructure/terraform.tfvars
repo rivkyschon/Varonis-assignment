@@ -27,4 +27,3 @@ create_access_context_manager_access_policy = false
 
 #load balancer:
 name = "my-lb"
-domain = "my-domain-name"
