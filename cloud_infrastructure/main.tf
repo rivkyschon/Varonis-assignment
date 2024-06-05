@@ -28,3 +28,12 @@ module "kms_key" {
   project_id = "varonis-assignment-425319"
 }
 
+module "artifact_registry" {
+  source            = "./modules/artifact_registry"
+  location          = var.region 
+  repository_id     = "my-docker-repo"  
+  description       = "Docker repository for my secure web app"
+  kms_key_name      = var.kms_key_name
+  writer_members    = var.writer_members
+  reader_members    = var.reader_members
+}
