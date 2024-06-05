@@ -26,12 +26,12 @@ module "network" {
   lb_subnet_cidr         = var.lb_subnet_cidr 
 }
 
-module "kms_key" {
-  source  = "terraform-google-modules/kms/google//examples/simple_example"
-  version = "2.3.0"
-  keyring = "artifact_registry_kms"
-  project_id = "varonis-assignment-425319"
-}
+#module "kms_key" {
+ # source  = "terraform-google-modules/kms/google//examples/simple_example"
+  #version = "2.3.0"
+  #keyring = "artifact_registry_kms"
+  #project_id = "varonis-assignment-425319"
+#}
 
 module "artifact_registry" {
   source            = "./modules/artifact_registry"
