@@ -20,6 +20,9 @@ resource "google_compute_security_policy" "policy" {
     priority = "2147483647"
     match {
       versioned_expr = "SRC_IPS_V1"
+      config {
+        src_ip_ranges = ["*"]  # Match all source IP addresses
+      }
     }
     description = "Default deny rule"
   }
@@ -42,7 +45,7 @@ resource "google_compute_region_network_endpoint_group" "cloudrun_neg" {
 # Health Check
 resource "google_compute_health_check" "default" {
   name               = "${var.lb_name}-health-check"
-  timeout_sec        = 10
+  timeout_sec        = 3
   check_interval_sec = 5
   http_health_check {
     port = "80" # Health check port on Cloud Run service
