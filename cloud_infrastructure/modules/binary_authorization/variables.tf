@@ -1,22 +1,25 @@
-# variables.tf
-
 variable "project_id" {
-  description = "The ID of the project where the KMS key will be created"
-}
-
-variable "keyring" {
-  description = "The name of the key ring to create"
-}
-
-variable "key_name" {
-  description = "The name of the KMS key to create"
+  description = "The ID of the project in which to create the resources."
+  type        = string
 }
 
 variable "location" {
-  description = "The location (region) for the key ring"
+  description = "The location where the resources will be created."
+  type        = string
 }
 
-variable "members" {
-  description = "List of IAM policy bindings for the key"
-  type        = list(string)
+variable "attestor_id" {
+  description = "The ID of the Binary Authorization attestor."
+  type        = string
+  default     = "cb-attestor"
+}
+
+variable "key_ring_name" {
+  description = "The name of the KMS key ring."
+  type        = string
+}
+
+variable "crypto_key_name" {
+  description = "The name of the KMS crypto key."
+  type        = string
 }

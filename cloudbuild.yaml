@@ -1,22 +1,51 @@
+substitutions:
+  _CONTAINER_REPO_NAME: 'my-docker-repo'
+  _SEVERITY: 'CRITICAL'
+  _ATTESTOR_ID: 'cb-attestor'
+  _KEY_LOCATION: 'global'
+  _KEYRING: 'blog-keyring'
+  _KEY_NAME: 'cd-blog'
+  _KEY_VERSION: '1'
+  _SERVICE_NAME: 'my-cloud-run-service'
+  _REGION: 'us-central1'
+
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY #Todo: save logs to GCS
+
 steps:
+  # - id: Run Static Code Analysis
+  #   name: 'gcr.io/cloud-builders/docker'
+  #   entrypoint: /bin/bash
+  #   args:
+  #     - -c
+  #     - |
+  #       apt-get update && apt-get install -y openjdk-11-jdk wget unzip &&
+  #       wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip &&
+  #       unzip sonar-scanner-cli-4.6.2.2472-linux.zip &&
+  #       ./sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner \
+  #         -Dsonar.projectKey=${_SONAR_PROJECT_KEY} \
+  #         -Dsonar.sources=. \
+  #         -Dsonar.host.url=${_SONAR_HOST_URL} \
+  #         -Dsonar.login=${_SONAR_LOGIN}
+
   - id: Build the Image
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID} . &&
-        docker image inspect us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID}
+        docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID . &&
+        docker image inspect us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID
+
   - id: Scan The Image
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        gcloud artifacts docker images scan us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID} \
+        gcloud artifacts docker images scan us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID \
         --format='value(response.scan)' > /workspace/scan_id.txt
+
   - id: Check For Vulnerabilities within the Image
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
@@ -24,38 +53,87 @@ steps:
       - -c
       - |
         gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
-        # --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq ${_SEVERITY}; \
-        # then echo 'Vulnerability check failed for docker image revision ID "${_REVISION_ID}", and will not be pushed to Artifact Registry Repo "${_CONTAINER_REPO_NAME}" because "${_SEVERITY}" checks are impacting the image and needs to be fixed' && exit 1; else exit 0; fi
+        --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq ${_SEVERITY}; \
+        then echo 'Vulnerability check failed for docker image revision ID "$BUILD_ID", and will not be pushed to Artifact Registry Repo "${_CONTAINER_REPO_NAME}" because "${_SEVERITY}" checks are impacting the image and needs to be fixed' && exit 1; else exit 0; fi
+
+  # - id: Scan The Image for Vulnerabilities using Trivy
+  #   name: 'gcr.io/cloud-builders/docker'
+  #   entrypoint: /bin/bash
+  #   args:
+  #     - -c
+  #     - |
+  #       apt-get update && apt-get install -y wget &&
+  #       wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.deb &&
+  #       dpkg -i trivy_0.18.3_Linux-64bit.deb &&
+  #       trivy image --exit-code 1 --severity ${_SEVERITY} us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID
+
   - id: Push Image to Artifact Registry
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        docker push us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID}
+        docker push us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID
+
   - id: Capture Image Digest Information
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        gcloud container images describe us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID} \
+        gcloud container images describe us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID \
         --format='get(image_summary.digest)' > /workspace/digest.txt
-  - id: Change permissions on create_binauthz_policy.sh
-    name: bash
-    args: ['chmod', '+x', './create_binauthz_policy.sh']
-  - id: Apply Binary Authorization Custom Policy for Image
-    name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: /bin/sh'
-    args:
-      - -c
-      - |
-        ./scripts/create_binauthz_policy.sh
-  - id: Create a cloud deploy release
+
+  - id: Sign the Image with Binary Authorization
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        gcloud deploy releases create r-${_REVISION_ID} --project=$PROJECT_ID --region=us-central1 --delivery-pipeline=ci-cd-test --images=notes-app-image=us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app@$(cat /workspace/digest.txt)
-images: ['us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID}']
+        gcloud beta container binauthz attestations sign-and-create \
+          --artifact-url="us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app@$(cat /workspace/digest.txt)" \
+          --attestor="${_ATTESTOR_ID}" \
+          --attestor-project="${PROJECT_ID}" \
+          --keyversion-project="${PROJECT_ID}" \
+          --keyversion-location="${_KEY_LOCATION}" \
+          --keyversion-keyring="${_KEYRING}" \
+          --keyversion-key="${_KEY_NAME}" \
+          --keyversion="${_KEY_VERSION}"
+
+  - id: Apply Binary Authorization Custom Policy for Image
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        gcloud container binauthz policy import \
+          --source=- <<EOF
+        {
+          "globalPolicyEvaluationMode": "ENABLE",
+          "defaultAdmissionRule": {
+              "enforcementMode": "ENFORCED_BLOCK_AND_AUDIT_LOG",
+              "evaluationMode": "REQUIRE_ATTESTATION",
+              "requireAttestationsBy": [
+                  "projects/${PROJECT_ID}/attestors/${_ATTESTOR_ID}"
+              ]
+          },
+          "name": "projects/${PROJECT_ID}/policy"
+        }
+        EOF
+
+  - id: Deploy to Cloud Run
+    name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - run
+      - deploy
+      - ${_SERVICE_NAME}
+      - --image
+      - us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app@$(cat /workspace/digest.txt)
+      - --region
+      - ${_REGION}
+      - --platform
+      - managed
+      - --allow-unauthenticated
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID'

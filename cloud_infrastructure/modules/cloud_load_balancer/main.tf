@@ -27,7 +27,7 @@ resource "google_compute_security_policy" "policy" {
     description = "Default deny rule"
   }
 
-  # Add more specific Cloud Armor rules - OWASP Top 10 rules
+  # Todo: Add more specific Cloud Armor rules - OWASP Top 10 rules
 }
 
 # Global Network Endpoint Group

@@ -9,7 +9,7 @@ resource "google_compute_subnetwork" "cloud_run_subnet" {
   ip_cidr_range = var.cloud_run_subnet_cidr
   network       = google_compute_network.vpc.id
   region        = var.region
-  private_ip_google_access = true  # Allow access to Google APIs
+  private_ip_google_access = true 
   purpose      = "PRIVATE"
 }
 
@@ -18,6 +18,5 @@ resource "google_compute_subnetwork" "lb_subnet" {
   ip_cidr_range = var.lb_subnet_cidr
   network       = google_compute_network.vpc.id
   region        = var.region
-  # private_ip_google_access = false # Optional for private LB subnet
 }
 

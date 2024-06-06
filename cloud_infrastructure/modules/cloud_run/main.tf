@@ -1,5 +1,5 @@
 resource "google_cloud_run_service" "default" {
-  name     = "hello"
+  name     = "sample-app"
   location = var.region
   project  = var.project_id
 
@@ -9,7 +9,17 @@ resource "google_cloud_run_service" "default" {
         image = var.image
       }
     }
+    metadata {
+      annotations = {
+        "run.googleapis.com/ingress" = "internal"
+        "binaryauthorization.googleapis.com/secure-mode" = "true"
+      }
+    }
   }
+
+  depends_on = [
+    google_binary_authorization_policy.policy
+  ]
 }
 
 resource "google_cloud_run_service_iam_member" "member" {

@@ -8,49 +8,62 @@ terraform {
   }
 }
 
-provider "google" {
-  project     = var.project_id
-  region      = var.region
+resource "google_project_service" "enable_apis" {
+  for_each = toset([
+    "cloudbuild.googleapis.com",
+    "containerregistry.googleapis.com",
+    "binaryauthorization.googleapis.com",
+    "run.googleapis.com",
+  ])
+  project = var.project_id
+  service = each.key
 }
 
-provider "google-beta" {
-  project     = var.project_id
-  region      = var.region
+module "iam" {
+  source     = "./modules/iam"
+  project_id = var.project_id
 }
 
-module "network" {
-  source                 = "./modules/network"
-  vpc_name               = var.vpc_name        # From your terraform.tfvars
-  region                 = var.region           # From your terraform.tfvars
+module "vpc" {
+  source                 = "./modules/vpc"
+  vpc_name               = var.vpc_name
+  region                 = var.region
   cloud_run_subnet_cidr  = var.cloud_run_subnet_cidr 
   lb_subnet_cidr         = var.lb_subnet_cidr 
 }
 
-#module "kms" {
- # source     = "./modules/kms"
- # project_id = var.project_id
- # keyring    = "artifact_registry_kms"
- # key_name   = "my_artifact_registry_key"
- # location   = var.location
- # members    = ["rivky.schon@grunitech.com"]  # Add IAM policy bindings here if needed
-#}
+module "kms" {
+  source          = "./modules/kms"
+  key_ring_name   = var.kms_key_ring_name
+  crypto_key_name = var.kms_crypto_key_name
+  location        = var.region
+  rotation_period = var.kms_rotation_period
+}
+
+module "binary_authorization" {
+  source          = "./modules/binary_authorization"
+  project_id      = var.project_id
+  location        = var.location
+  attestor_id     = "cb-attestor"
+  key_ring_name   = module.kms.key_ring_name
+  crypto_key_name = module.kms.crypto_key_name
+}
 
 module "artifact_registry" {
   source            = "./modules/artifact_registry"
   location          = var.region 
   repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
- # kms_key_name      = module.kms.key_name
+  kms_key_id        =  module.kms.crypto_key_id
 }
 
 module "cloud_run" {
-  image = "us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0"
-  cr_name = "cr"
-  source  = "./modules/cloud_run"
-  region = var.region
-  project_id = var.project_id
+  image             = "us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0"
+  cr_name           = var.cr_name
+  source            = "./modules/cloud_run"
+  region            = var.region
+  project_id        = var.project_id
 }
-
 
 module "cloud_load_balancer" {
   source = "./modules/cloud_load_balancer"
@@ -66,3 +79,4 @@ module "cloud_build" {
   region = var.region
   project_id = var.project_id
 }
+
