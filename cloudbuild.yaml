@@ -25,8 +25,7 @@ steps:
         apt-get update && apt-get install -y openjdk-11-jdk wget unzip &&
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip &&
         unzip sonar-scanner-cli-4.6.2.2472-linux.zip &&
-        export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin &&
-        sonar-scanner \
+        ./sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner \
           -Dsonar.projectKey=${_SONAR_PROJECT_KEY} \
           -Dsonar.sources=. \
           -Dsonar.host.url=${_SONAR_HOST_URL} \
