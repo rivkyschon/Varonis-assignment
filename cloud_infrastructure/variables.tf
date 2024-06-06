@@ -89,6 +89,20 @@ variable "lb_name" {
   type        = string
 }
 
+variable "kms_key_ring_name" {
+  description = "varonis_key_ring"
+  type        = string
+  default     = "my-key-ring"
+}
 
-# Add more variables here if you have additional ones in your terraform.tfvars file
-# ... (other variables if applicable)
+variable "kms_crypto_key_name" {
+  description = "varonis_crypto_key"
+  type        = string
+  default     = "my-crypto-key"
+}
+
+variable "kms_rotation_period" {
+  description = "100000s"
+  type        = string
+  default     = "100000s"
+}
