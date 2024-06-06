@@ -8,9 +8,30 @@ substitutions:
   _KEY_VERSION: '1'
   _SERVICE_NAME: 'my-cloud-run-service'
   _REGION: 'us-central1'
+  _SONAR_PROJECT_KEY: 'your-sonar-project-key'
+  _SONAR_HOST_URL: 'http://your-sonarqube-server-url'
+  _SONAR_LOGIN: 'your-sonar-token'
+
 options:
   logging: CLOUD_LOGGING_ONLY
+
 steps:
+  - id: Run Static Code Analysis
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        apt-get update && apt-get install -y openjdk-11-jdk wget unzip &&
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip &&
+        unzip sonar-scanner-cli-4.6.2.2472-linux.zip &&
+        export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin &&
+        sonar-scanner \
+          -Dsonar.projectKey=${_SONAR_PROJECT_KEY} \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=${_SONAR_HOST_URL} \
+          -Dsonar.login=${_SONAR_LOGIN}
+
   - id: Build the Image
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: /bin/bash
@@ -19,6 +40,7 @@ steps:
       - |
         docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID . &&
         docker image inspect us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID
+
   - id: Scan The Image
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
@@ -27,6 +49,7 @@ steps:
       - |
         gcloud artifacts docker images scan us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID \
         --format='value(response.scan)' > /workspace/scan_id.txt
+
   - id: Check For Vulnerabilities within the Image
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
@@ -36,6 +59,7 @@ steps:
         gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
         --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq ${_SEVERITY}; \
         then echo 'Vulnerability check failed for docker image revision ID "$BUILD_ID", and will not be pushed to Artifact Registry Repo "${_CONTAINER_REPO_NAME}" because "${_SEVERITY}" checks are impacting the image and needs to be fixed' && exit 1; else exit 0; fi
+
   - id: Push Image to Artifact Registry
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: /bin/bash
@@ -43,6 +67,7 @@ steps:
       - -c
       - |
         docker push us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID
+
   - id: Capture Image Digest Information
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
