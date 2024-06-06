@@ -9,7 +9,7 @@ terraform {
 }
 
 module "vpc" {
-  source                 = "./modules/network"
+  source                 = "./modules/vpc"
   vpc_name               = var.vpc_name
   region                 = var.region
   cloud_run_subnet_cidr  = var.cloud_run_subnet_cidr 
