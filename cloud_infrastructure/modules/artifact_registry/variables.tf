@@ -15,20 +15,8 @@ variable "description" {
   default     = "Docker repository for my application"
 }
 
-variable "kms_key_name" {
+variable "kms_key_id" {
   type        = string
-  description = "The Cloud KMS key name for encrypting the repository data."
+  description = "The Cloud KMS key id for encrypting the repository data."
   default     = null  # Use Google-managed keys if not specified
-}
-
-variable "writer_members" {
-  type        = list(string)
-  description = "The list of members who will have write access to the repository."
-  default     = []
-}
-
-variable "reader_members" {
-  type        = list(string)
-  description = "The list of members who will have read access to the repository."
-  default     = []
 }

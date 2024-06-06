@@ -14,6 +14,11 @@ variable "vpc_name" {
   description = "Name of the VPC"
 }
 
+variable "cr_name" {
+  type        = string
+  description = "Name of Cloud Run service"
+}
+
 variable "domain" {
   description = "Domain for the managed SSL certificate"
   type        = string
