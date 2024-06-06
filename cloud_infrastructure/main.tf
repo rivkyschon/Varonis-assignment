@@ -17,7 +17,7 @@ module "vpc" {
 }
 
 module "kms" {
-  source          = "../../modules/kms"
+  source          = "./modules/kms"
   key_ring_name   = var.kms_key_ring_name
   crypto_key_name = var.kms_crypto_key_name
   location        = var.region
