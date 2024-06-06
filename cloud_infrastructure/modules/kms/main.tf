@@ -12,8 +12,3 @@ resource "google_kms_crypto_key" "crypto_key" {
     prevent_destroy = true
   }
 }
-
-
-output "crypto_key_id" {
-  value = google_kms_crypto_key.crypto_key.id
-}
