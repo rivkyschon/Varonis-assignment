@@ -1,5 +1,5 @@
 resource "google_cloud_run_service" "default" {
-  name     = "hello"
+  name     = "sample-app"
   location = var.region
   project  = var.project_id
 
@@ -9,8 +9,15 @@ resource "google_cloud_run_service" "default" {
         image = var.image
       }
     }
+    metadata {
+      annotations = {
+        "run.googleapis.com/ingress" = "internal"
+      }
+    }
   }
 }
+
+
 
 resource "google_cloud_run_service_iam_member" "member" {
   location = google_cloud_run_service.default.location

@@ -13,4 +13,3 @@ output "lb_subnet_id" {
   description = "The ID of the load balancer subnet."
 }
 
-# Add more outputs if needed for other network resources (e.g., firewall rules)

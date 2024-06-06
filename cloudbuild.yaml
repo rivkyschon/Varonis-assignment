@@ -2,6 +2,13 @@ substitutions:
   _CONTAINER_REPO_NAME: 'my-docker-repo'
   _REVISION_ID: 'your-revision-id'
   _SEVERITY: 'CRITICAL'
+  _ATTESTOR_ID: 'cb-attestor'
+  _KEY_LOCATION: 'global'
+  _KEYRING: 'blog-keyring'
+  _KEY_NAME: 'cd-blog'
+  _KEY_VERSION: '1'
+  _SERVICE_NAME: 'my-cloud-run-service'
+  _REGION: 'us-central1'
 options:
   logging: CLOUD_LOGGING_ONLY
 steps:
@@ -28,8 +35,8 @@ steps:
       - -c
       - |
         gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
-        # --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq ${_SEVERITY}; \
-        # then echo 'Vulnerability check failed for docker image revision ID "${_REVISION_ID}", and will not be pushed to Artifact Registry Repo "${_CONTAINER_REPO_NAME}" because "${_SEVERITY}" checks are impacting the image and needs to be fixed' && exit 1; else exit 0; fi
+        --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq ${_SEVERITY}; \
+        then echo 'Vulnerability check failed for docker image revision ID "${_REVISION_ID}", and will not be pushed to Artifact Registry Repo "${_CONTAINER_REPO_NAME}" because "${_SEVERITY}" checks are impacting the image and needs to be fixed' && exit 1; else exit 0; fi
   - id: Push Image to Artifact Registry
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: /bin/bash
@@ -45,21 +52,57 @@ steps:
       - |
         gcloud container images describe us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID} \
         --format='get(image_summary.digest)' > /workspace/digest.txt
-  - id: Change permissions on create_binauthz_policy.sh
-    name: bash
-    args: ['chmod', '+x', './create_binauthz_policy.sh']
-  - id: Apply Binary Authorization Custom Policy for Image
-    name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: /bin/sh'
-    args:
-      - -c
-      - |
-        ./scripts/create_binauthz_policy.sh
-  - id: Create a cloud deploy release
+
+  - id: Sign the Image with Binary Authorization
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        gcloud deploy releases create r-${_REVISION_ID} --project=$PROJECT_ID --region=us-central1 --delivery-pipeline=ci-cd-test --images=notes-app-image=us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app@$(cat /workspace/digest.txt)
-images: ['us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID}']
+        gcloud beta container binauthz attestations sign-and-create \
+          --artifact-url="us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app@$(cat /workspace/digest.txt)" \
+          --attestor="${_ATTESTOR_ID}" \
+          --attestor-project="${PROJECT_ID}" \
+          --keyversion-project="${PROJECT_ID}" \
+          --keyversion-location="${_KEY_LOCATION}" \
+          --keyversion-keyring="${_KEYRING}" \
+          --keyversion-key="${_KEY_NAME}" \
+          --keyversion="${_KEY_VERSION}"
+
+  - id: Apply Binary Authorization Custom Policy for Image
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        gcloud container binauthz policy import \
+          --source=- <<EOF
+        {
+          "globalPolicyEvaluationMode": "ENABLE",
+          "defaultAdmissionRule": {
+              "enforcementMode": "ENFORCED_BLOCK_AND_AUDIT_LOG",
+              "evaluationMode": "REQUIRE_ATTESTATION",
+              "requireAttestationsBy": [
+                  "projects/${PROJECT_ID}/attestors/${_ATTESTOR_ID}"
+              ]
+          },
+          "name": "projects/${PROJECT_ID}/policy"
+        }
+        EOF
+
+  - id: Deploy to Cloud Run
+    name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - run
+      - deploy
+      - ${_SERVICE_NAME}
+      - --image
+      - us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app@$(cat /workspace/digest.txt)
+      - --region
+      - ${_REGION}
+      - --platform
+      - managed
+      - --allow-unauthenticated
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:${_REVISION_ID}'
