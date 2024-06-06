@@ -8,12 +8,9 @@ substitutions:
   _KEY_VERSION: '1'
   _SERVICE_NAME: 'my-cloud-run-service'
   _REGION: 'us-central1'
-  _SONAR_PROJECT_KEY: 'your-sonar-project-key'
-  _SONAR_HOST_URL: 'http://your-sonarqube-server-url'
-  _SONAR_LOGIN: 'your-sonar-token'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY #Todo: save logs to GCS
 
 steps:
   # - id: Run Static Code Analysis
