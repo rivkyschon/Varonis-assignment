@@ -30,6 +30,7 @@ module "artifact_registry" {
   repository_id     = "my-docker-repo"  
   description       = "Docker repository for my secure web app"
   kms_key_id        =  module.kms.crypto_key_id
+}
 
 module "cloud_run" {
   image             = "us-central1-docker.pkg.dev/varonis-assignment-425319/my-docker-repo/sample-django-app:v0.0.0"
@@ -38,7 +39,6 @@ module "cloud_run" {
   region            = var.region
   project_id        = var.project_id
 }
-
 
 module "cloud_load_balancer" {
   source = "./modules/cloud_load_balancer"
