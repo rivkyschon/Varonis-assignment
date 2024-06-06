@@ -56,6 +56,17 @@ steps:
         --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq ${_SEVERITY}; \
         then echo 'Vulnerability check failed for docker image revision ID "$BUILD_ID", and will not be pushed to Artifact Registry Repo "${_CONTAINER_REPO_NAME}" because "${_SEVERITY}" checks are impacting the image and needs to be fixed' && exit 1; else exit 0; fi
 
+  # - id: Scan The Image for Vulnerabilities using Trivy
+  #   name: 'gcr.io/cloud-builders/docker'
+  #   entrypoint: /bin/bash
+  #   args:
+  #     - -c
+  #     - |
+  #       apt-get update && apt-get install -y wget &&
+  #       wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.deb &&
+  #       dpkg -i trivy_0.18.3_Linux-64bit.deb &&
+  #       trivy image --exit-code 1 --severity ${_SEVERITY} us-central1-docker.pkg.dev/$PROJECT_ID/${_CONTAINER_REPO_NAME}/sample-django-app:$BUILD_ID
+
   - id: Push Image to Artifact Registry
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: /bin/bash
