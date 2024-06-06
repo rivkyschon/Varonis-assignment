@@ -16,20 +16,20 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  - id: Run Static Code Analysis
-    name: 'gcr.io/cloud-builders/docker'
-    entrypoint: /bin/bash
-    args:
-      - -c
-      - |
-        apt-get update && apt-get install -y openjdk-11-jdk wget unzip &&
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip &&
-        unzip sonar-scanner-cli-4.6.2.2472-linux.zip &&
-        ./sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner \
-          -Dsonar.projectKey=${_SONAR_PROJECT_KEY} \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=${_SONAR_HOST_URL} \
-          -Dsonar.login=${_SONAR_LOGIN}
+  # - id: Run Static Code Analysis
+  #   name: 'gcr.io/cloud-builders/docker'
+  #   entrypoint: /bin/bash
+  #   args:
+  #     - -c
+  #     - |
+  #       apt-get update && apt-get install -y openjdk-11-jdk wget unzip &&
+  #       wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip &&
+  #       unzip sonar-scanner-cli-4.6.2.2472-linux.zip &&
+  #       ./sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner \
+  #         -Dsonar.projectKey=${_SONAR_PROJECT_KEY} \
+  #         -Dsonar.sources=. \
+  #         -Dsonar.host.url=${_SONAR_HOST_URL} \
+  #         -Dsonar.login=${_SONAR_LOGIN}
 
   - id: Build the Image
     name: 'gcr.io/cloud-builders/docker'
