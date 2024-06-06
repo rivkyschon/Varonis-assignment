@@ -5,7 +5,7 @@
 This project sets up the secure infrastructure and deployment pipelines for the DevConnect application using Google Cloud Platform (GCP) and Terraform.
 
 ## Cloud Architecture
-![image](https://github.com/rivkyschon/Varonis-assignment/assets/113901370/d06e9c37-e1e6-4bde-a85a-0c1328eb4642)
+![image](https://github.com/rivkyschon/Varonis-assignment/assets/113901370/8d89705b-bf2a-4a99-88fa-dbc528715033)
 
 
 ## Project Structure
