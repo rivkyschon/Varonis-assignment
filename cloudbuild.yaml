@@ -1,3 +1,7 @@
+substitutions:
+  _CONTAINER_REPO_NAME: 'my-docker-repo'
+  _REVISION_ID: 'your-revision-id'
+  _SEVERITY: 'CRITICAL'
 options:
   logging: CLOUD_LOGGING_ONLY
 steps:
