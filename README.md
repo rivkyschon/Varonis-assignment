@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project sets up the infrastructure and deployment pipelines for the DevConnect application using Google Cloud Platform (GCP) and Terraform.
+This project sets up the secure infrastructure and deployment pipelines for the DevConnect application using Google Cloud Platform (GCP) and Terraform.
 
 ## Project Structure
 
