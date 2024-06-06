@@ -8,6 +8,22 @@ terraform {
   }
 }
 
+resource "google_project_service" "enable_apis" {
+  for_each = toset([
+    "cloudbuild.googleapis.com",
+    "containerregistry.googleapis.com",
+    "binaryauthorization.googleapis.com",
+    "run.googleapis.com",
+  ])
+  project = var.project_id
+  service = each.key
+}
+
+module "iam" {
+  source     = "./modules/iam"
+  project_id = var.project_id
+}
+
 module "vpc" {
   source                 = "./modules/vpc"
   vpc_name               = var.vpc_name
@@ -22,6 +38,15 @@ module "kms" {
   crypto_key_name = var.kms_crypto_key_name
   location        = var.region
   rotation_period = var.kms_rotation_period
+}
+
+module "binary_authorization" {
+  source          = "./modules/binary_authorization"
+  project_id      = var.project_id
+  location        = var.location
+  attestor_id     = "cb-attestor"
+  key_ring_name   = module.kms.key_ring_name
+  crypto_key_name = module.kms.crypto_key_name
 }
 
 module "artifact_registry" {
@@ -54,3 +79,4 @@ module "cloud_build" {
   region = var.region
   project_id = var.project_id
 }
+

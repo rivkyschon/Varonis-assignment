@@ -12,12 +12,15 @@ resource "google_cloud_run_service" "default" {
     metadata {
       annotations = {
         "run.googleapis.com/ingress" = "internal"
+        "binaryauthorization.googleapis.com/secure-mode" = "true"
       }
     }
   }
+
+  depends_on = [
+    google_binary_authorization_policy.policy
+  ]
 }
-
-
 
 resource "google_cloud_run_service_iam_member" "member" {
   location = google_cloud_run_service.default.location
